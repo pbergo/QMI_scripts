@@ -107,7 +107,7 @@ CALL ImportSakila.bat
 
 ECHO Installing Employee...
 IF EXIST ImportEmployee.bat DEL /S /Q ImportEmployee.bat
-WGET -O ImportSakila.bat https://github.com/pbergo/QMI_scripts/raw/master/ImportEmployee.bat --append-output=UpdateQDI.log
+WGET -O ImportEmployee.bat https://github.com/pbergo/QMI_scripts/raw/master/ImportEmployee.bat --append-output=UpdateQDI.log
 CALL ImportEmployee.bat
 
 GOTO :CLEANFILES
