@@ -10,7 +10,7 @@ SET /P confirm=Are you sure (Y/[N])?
 IF /I "%confirm%" NEQ "Y" GOTO ENDBYUSER
 
 ECHO Creating tempfile DownloadUtils...
-ECHO $url = "https://github.com/pbergo/QMI_scripts/blob/master/Utils/wget.exe"  > C:\Users\Administrator\Downloads\TempDownloadUtils.ps1
+ECHO $url = "https://github.com/pbergo/QMI_scripts/raw/master/Utils/wget.exe"   > C:\Users\Administrator\Downloads\TempDownloadUtils.ps1
 ECHO $output = "C:\Users\Administrator\Downloads\wget.exe"                      >> C:\Users\Administrator\Downloads\TempDownloadUtils.ps1
 ECHO $start_time = Get-Date                                                     >> C:\Users\Administrator\Downloads\TempDownloadUtils.ps1
 ECHO Import-Module BitsTransfer                                                 >> C:\Users\Administrator\Downloads\TempDownloadUtils.ps1
