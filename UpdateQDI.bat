@@ -88,7 +88,7 @@ GOTO :CHKCHROMEOPEN
 SET CHROMEBASE=%LOCALAPPDATA%\Google\Chrome\User Data\Default\
 SET CHROMEBACKUPDIR=C:\Users\Administrator\Downloads\ChromeBookmarks
 IF EXIST "%CHROMEBACKUPDIR%" XCOPY "%CHROMEBACKUPDIR%" "%CHROMEBASE%" /E /Q /Y /c
-GOTO :CLEANFILES
+GOTO :INSTALLDBS
 
 :CHROMEISOPEN
 ECHO Please close Google Chrome.
@@ -97,7 +97,9 @@ ECHO I will automatically try again once you continue.
 ECHO Press any key to continue...
 CHOICE /N /C Y /D Y /T 2 > NUL
 PAUSE >NUL
+GOTO :INSTALLDBS
 
+:INSTALLDBS
 ECHO Installing sakila...
 IF EXIST ImportSakila.bat DEL /S /Q ImportSakila.bat
 WGET -O ImportSakila.bat https://github.com/pbergo/QMI_scripts/raw/master/ImportSakila.bat --append-output=UpdateQDI.log
