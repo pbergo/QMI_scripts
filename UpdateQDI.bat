@@ -17,19 +17,26 @@ DEL /S /Q *.LOG
 
 ECHO Checking Utils...
 CD "c:\Users\Administrator\Downloads"
-IF NOT EXIST WGET.EXE {
-    IF NOT EXIST DownloadUtils.bat (
-        ECHO Creating tempfile DownloadUtils...
-        ECHO $url = "https://raw.githubusercontent.com/pbergo/QMI_scripts/master/DownloadUtils.bat"    > C:\Users\Administrator\Downloads\TempDownloadUtils.ps1
-        ECHO $output = "C:\Users\Administrator\Downloads\DownloadUtils.bat"                            >> C:\Users\Administrator\Downloads\TempDownloadUtils.ps1
-        ECHO $start_time = Get-Date                                                                    >> C:\Users\Administrator\Downloads\TempDownloadUtils.ps1
-        ECHO Import-Module BitsTransfer                                                                >> C:\Users\Administrator\Downloads\TempDownloadUtils.ps1
-        ECHO Download Utils...
-        POWERSHELL c:\Users\Administrator\Downloads\TempDownloadUtils.ps1 >> C:\Users\Administrator\Downloads\UpdateQDI.log
-    )
-    CALL "C:\Users\Administrator\Downloads\DownloadUtils.bat"
-}
+IF NOT EXIST WGET.EXE GOTO :INSTALLUTILS
+GOTO :UPDATEQDI
 
+:INSTALLUTILS
+ECHO Creating tempfile DownloadWget...
+ECHO $url = "https://github.com/pbergo/QMI_scripts/raw/master/Utils/wget.exe"   > C:\Users\Administrator\Downloads\TempDownloadUtils.ps1
+ECHO $output = "C:\Users\Administrator\Downloads\wget.exe"                      >> C:\Users\Administrator\Downloads\TempDownloadUtils.ps1
+ECHO $start_time = Get-Date                                                     >> C:\Users\Administrator\Downloads\TempDownloadUtils.ps1
+ECHO Import-Module BitsTransfer                                                 >> C:\Users\Administrator\Downloads\TempDownloadUtils.ps1
+ECHO Start-BitsTransfer -Source $url -Destination $output                       >> C:\Users\Administrator\Downloads\TempDownloadUtils.ps1
+
+ECHO Downloading Util files...
+CD "c:\Users\Administrator\Downloads"
+POWERSHELL c:\Users\Administrator\Downloads\TempDownloadUtils.ps1 > C:\Users\Administrator\Downloads\DownloadUtils.log
+CD "c:\Users\Administrator\Downloads"
+IF NOT EXIST UNZIP.EXE WGET https://github.com/pbergo/QMI_scripts/raw/master/Utils/unzip.exe --append-output=DownloadUtils.log
+GOTO :UPDATEQDI
+
+
+:UPDATEQDI
 ECHO Download Qlik Replicate...
 IF EXIST QlikReplicate.zip DEL /S /Q QlikReplicate.zip
 WGET -O QlikReplicate.zip https://da3hntz84uekx.cloudfront.net/QlikReplicate/2021.11/2/_MSI/QlikReplicate_2021.11.0.165_X64.zip --append-output=UpdateQDI.log
@@ -67,7 +74,6 @@ ECHO Installing Bookmarks...
 SET CHROMEBASE=%LOCALAPPDATA%\Google\Chrome\User Data\Default\
 SET CHROMEBACKUPDIR=C:\Users\Administrator\Downloads\ChromeBookmarks
 IF EXIST "%CHROMEBACKUPDIR%" XCOPY "%CHROMEBACKUPDIR%" "%CHROMEBASE%" /E /Q /Y
-
 
 GOTO :CLEANFILES
 
