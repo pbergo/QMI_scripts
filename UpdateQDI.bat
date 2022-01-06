@@ -1,4 +1,9 @@
 @ECHO OFF
+REM ****************************************************
+REM * Copyright: Qlik (c) 2022                         *
+REM * Author: Pedro Bergo - pedro.bergo@qlik.com       *
+REM * Purpose: Update QDI version of training machines *
+REM ****************************************************
 SETLOCAL
 SET confirm=N
 ECHO ************************************************
@@ -7,6 +12,9 @@ ECHO This script will update QDI files:
 ECHO - Qlik Replicate - 2021.11 SR1
 ECHO - Qlik Enterprise Manager - 2021.11 SR1
 ECHO - Qlik Compose - 2021.08 SR2
+ECHO It also try to import Sakila and Employees DB to
+ECHO MySQL local instance.
+ECHO .
 :PROMPT
 SET /P confirm=Are you sure (Y/[N])?
 IF /I "%confirm%" NEQ "Y" GOTO ENDBYUSER
@@ -30,9 +38,8 @@ ECHO Start-BitsTransfer -Source $url -Destination $output                       
 
 ECHO Downloading Util files...
 CD "c:\Users\Administrator\Downloads"
-POWERSHELL c:\Users\Administrator\Downloads\TempDownloadUtils.ps1 > C:\Users\Administrator\Downloads\DownloadUtils.log
-CD "c:\Users\Administrator\Downloads"
-IF NOT EXIST UNZIP.EXE WGET https://github.com/pbergo/QMI_scripts/raw/master/Utils/unzip.exe --append-output=DownloadUtils.log
+POWERSHELL c:\Users\Administrator\Downloads\TempDownloadUtils.ps1 > C:\Users\Administrator\Downloads\UpdateQDI.log
+IF NOT EXIST UNZIP.EXE WGET https://github.com/pbergo/QMI_scripts/raw/master/Utils/unzip.exe --append-output=UpdateQDI.log
 GOTO :UPDATEQDI
 
 :UPDATEQDI
@@ -71,13 +78,37 @@ QlikEnterpriseManager_2021.11.0.198_X64.exe
 
 ECHO Unzip Bookmarks...
 UNZIP -o QlikBookmarks.zip >> C:\Users\Administrator\Downloads\UpdateQDI.log
+:CHKCHROMEOPEN
 ECHO Installing Bookmarks...
+TASKLIST /FI "IMAGENAME eq chrome.exe" | FINDSTR "chrome.exe" > nul
+IF %ERRORLEVEL% == 0 (
+CALL :CHROMEISOPEN
+GOTO :CHKCHROMEOPEN
+)
 SET CHROMEBASE=%LOCALAPPDATA%\Google\Chrome\User Data\Default\
 SET CHROMEBACKUPDIR=C:\Users\Administrator\Downloads\ChromeBookmarks
 IF EXIST "%CHROMEBACKUPDIR%" XCOPY "%CHROMEBACKUPDIR%" "%CHROMEBASE%" /E /Q /Y /c
-
 GOTO :CLEANFILES
 
+:CHROMEISOPEN
+ECHO Please close Google Chrome.
+ECHO If it appears to be closed but you still get this error please use task manager to end tasks with the name of "chrome.exe".
+ECHO I will automatically try again once you continue.
+ECHO Press any key to continue...
+CHOICE /N /C Y /D Y /T 2 > NUL
+PAUSE >NUL
+
+ECHO Installing sakila...
+IF EXIST ImportSakila.bat DEL /S /Q ImportSakila.bat
+WGET -O ImportSakila.bat https://github.com/pbergo/QMI_scripts/raw/master/ImportSakila.bat --append-output=UpdateQDI.log
+CALL ImportSakila.bat
+
+ECHO Installing Employee...
+IF EXIST ImportEmployee.bat DEL /S /Q ImportEmployee.bat
+WGET -O ImportSakila.bat https://github.com/pbergo/QMI_scripts/raw/master/ImportEmployee.bat --append-output=UpdateQDI.log
+CALL ImportEmployee.bat
+
+GOTO :CLEANFILES
 :ENDBYUSER
 ECHO QDI will not be updated !
 GOTO :END
@@ -92,7 +123,8 @@ GOTO :END
 
 :END 
 ECHO Update QDI Process terminated !
-ECHO ***************************************
+ECHO You will need to update Qlik licensing !
+ECHO ************************************************
 PAUSE
 
 ENDLOCAL
