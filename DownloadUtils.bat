@@ -1,15 +1,9 @@
 @ECHO OFF
 SETLOCAL
-SET confirm=N
 ECHO ***************************************
-ECHO **********    WARNING!!!!!  ***********
 ECHO This script will download utils 
 ECHO  wget, unzip and curl files.
-:PROMPT
-SET /P confirm=Are you sure (Y/[N])?
-IF /I "%confirm%" NEQ "Y" GOTO ENDBYUSER
-
-ECHO Creating tempfile DownloadUtils...
+ECHO Creating tempfile DownloadWget...
 ECHO $url = "https://github.com/pbergo/QMI_scripts/raw/master/Utils/wget.exe"   > C:\Users\Administrator\Downloads\TempDownloadUtils.ps1
 ECHO $output = "C:\Users\Administrator\Downloads\wget.exe"                      >> C:\Users\Administrator\Downloads\TempDownloadUtils.ps1
 ECHO $start_time = Get-Date                                                     >> C:\Users\Administrator\Downloads\TempDownloadUtils.ps1
@@ -18,22 +12,19 @@ ECHO Start-BitsTransfer -Source $url -Destination $output                       
 
 ECHO Downloading Util files...
 CD "c:\Users\Administrator\Downloads"
-POWERSHELL c:\Users\Administrator\Downloads\TempDownloadUtils.ps1 > C:\Users\Administrator\Downloads\TempDownloadUtils.log
-
+POWERSHELL c:\Users\Administrator\Downloads\TempDownloadUtils.ps1 > C:\Users\Administrator\Downloads\DownloadUtils.log
+CD "c:\Users\Administrator\Downloads"
+IF NOT EXIST UNZIP.EXE WGET https://github.com/pbergo/QMI_scripts/raw/master/Utils/unzip.exe --append-output=DownloadUtils.log
+REM IF NOT EXIST CURL.EXE  WGET https://github.com/pbergo/QMI_scripts/raw/master/Utils/curl.exe  --append-output=DownloadUtils.log
 GOTO :CLEANFILES
-
-:ENDBYUSER
-ECHO Utils will not be downloaded !
-GOTO :END
 
 :CLEANFILES
 ECHO Deleting tempfiles...
-DEL /s /q C:\Users\Administrator\Downloads\Temp*.ps1  >nul 2>&1
+DEL /s /q C:\Users\Administrator\Downloads\TempDownloadUtils.ps1  >nul 2>&1
 GOTO :END
 
 :END 
+ECHO Download Utils terminated !
 ECHO ***************************************
-ECHO Process terminated !
-PAUSE
 
 ENDLOCAL
