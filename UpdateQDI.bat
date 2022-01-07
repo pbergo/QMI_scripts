@@ -59,24 +59,24 @@ ECHO Downloading Bookmarks...
 IF EXIST QlikBookmarks.zip DEL /S /Q QlikBookmarks.zip
 WGET -O QlikBookmarks.zip https://github.com/pbergo/QMI_scripts/raw/master/ChromeBookmarks.zip --append-output=UpdateQDI.log
 
-ECHO Unzip Qlik Replicate...
+ECHO Unpacking Qlik Replicate...
 UNZIP -o QlikReplicate.zip >> C:\Users\Administrator\Downloads\UpdateQDI.log
 ECHO Upgrading Qlik Replicate...
 QlikReplicate_2021.11.0.165_X64.exe
 
-ECHO Unzip Qlik Compose...
+ECHO Unpacking Qlik Compose...
 UNZIP -o QlikCompose.zip >> C:\Users\Administrator\Downloads\UpdateQDI.log
 ECHO Stopping Qlik Compose Service to save memory...
 "C:\Program Files\Qlik\Compose\bin\ComposeCtl.exe" service stop
 REM ECHO Upgrading Qlik Compose...
 REM Qlik_Compose_2021.8.0.336.exe
 
-ECHO Unzip Qlik Enterprise Manager...
+ECHO Unpacking Qlik Enterprise Manager...
 UNZIP -o QlikEM.zip >> C:\Users\Administrator\Downloads\UpdateQDI.log
 ECHO Installing Qlik Enterprise Manager...
 QlikEnterpriseManager_2021.11.0.198_X64.exe
 
-ECHO Unzip Bookmarks...
+ECHO Unpacking Bookmarks...
 UNZIP -o QlikBookmarks.zip >> C:\Users\Administrator\Downloads\UpdateQDI.log
 :CHKCHROMEOPEN
 ECHO Installing Bookmarks...
@@ -100,17 +100,35 @@ PAUSE >NUL
 GOTO :INSTALLDBS
 
 :INSTALLDBS
-ECHO Installing sakila...
-IF EXIST ImportSakila.bat DEL /S /Q ImportSakila.bat
-WGET -O ImportSakila.bat https://github.com/pbergo/QMI_scripts/raw/master/ImportSakila.bat --append-output=UpdateQDI.log
-CALL ImportSakila.bat
+ECHO Downloding DB files...
+IF EXIST sakila-db.zip DEL /S /Q sakila-db.zip 
+WGET -O sakila-db.zip https://downloads.mysql.com/docs/sakila-db.zip
+IF EXIST employee-db.zip DEL /S /Q sakila-db.zip 
+WGET -O employee-db.zip https://github.com/datacharmer/test_db/archive/refs/heads/master.zip
 
-ECHO Installing Employee...
-IF EXIST ImportEmployee.bat DEL /S /Q ImportEmployee.bat
-WGET -O ImportEmployee.bat https://github.com/pbergo/QMI_scripts/raw/master/ImportEmployee.bat --append-output=UpdateQDI.log
-CALL ImportEmployee.bat
+ECHO Unpacking sakila...
+UNZIP -o sakila-db.zip >> C:\Users\Administrator\Downloads\UpdateQDI.log
+ECHO Creating tempfile ImportSakila...
+ECHO DROP SCHEMA IF EXISTS sakila;                                                  > C:\Users\Administrator\Downloads\TempImportSakila.sql
+ECHO SOURCE C:/Users/Administrator/Downloads/sakila-db/sakila-schema.sql;           >> C:\Users\Administrator\Downloads\TempImportSakila.sql
+ECHO SOURCE C:/Users/Administrator/Downloads/sakila-db/sakila-data.sql;             >> C:\Users\Administrator\Downloads\TempImportSakila.sql
+ECHO GRANT SUPER ON *.* TO compose;                                                 >> C:\Users\Administrator\Downloads\TempImportSakila.sql
+ECHO GRANT ALL ON *.* TO compose;                                                   >> C:\Users\Administrator\Downloads\TempImportSakila.sql
+ECHO Installing sakila database...
+"C:\Program Files\MySQL\MySQL Server 5.7\bin\mysql" -u root < C:\Users\Administrator\Downloads\TempImportSakila.sql >> C:\Users\Administrator\Downloads\UpdateQDI.log
+
+ECHO Unpacking employee...
+UNZIP -o employee-db.zip >> C:\Users\Administrator\Downloads\UpdateQDI.log
+ECHO Adding grant security to standard ImportEmployee...
+ECHO GRANT SUPER ON *.* TO compose;                                                 >> C:\Users\Administrator\Downloads\test_db-master\employees.sql
+ECHO GRANT ALL ON *.* TO compose;                                                   >> C:\Users\Administrator\Downloads\test_db-master\employees.sql
+ECHO Installing employee database...
+CD "C:\Users\Administrator\Downloads\test_db-master"
+"C:\Program Files\MySQL\MySQL Server 5.7\bin\mysql" -u root < C:\Users\Administrator\Downloads\test_db-master\employees.sql >> C:\Users\Administrator\Downloads\UpdateQDI.log
+CD "c:\Users\Administrator\Downloads"
 
 GOTO :CLEANFILES
+
 :ENDBYUSER
 ECHO QDI will not be updated !
 GOTO :END
@@ -118,9 +136,12 @@ GOTO :END
 :CLEANFILES
 ECHO Deleting tempfiles...
 DEL /s /q C:\Users\Administrator\Downloads\TempDownloadUtils.ps1  >nul 2>&1
+DEL /s /q C:\Users\Administrator\Downloads\TempImportSakila.sql  >nul 2>&1
 DEL /s /q C:\Users\Administrator\Downloads\Qlik*.zip  >nul 2>&1
 DEL /s /q C:\Users\Administrator\Downloads\*.exe  >nul 2>&1
 RMDIR /s /q C:\Users\Administrator\Downloads\ChromeBookmarks >nul 2>&1
+RMDIR /s /q C:\Users\Administrator\Downloads\sakila-db >nul 2>&1
+RMDIR /s /q C:\Users\Administrator\Downloads\test_db-master >nul 2>&1
 GOTO :END
 
 :END 

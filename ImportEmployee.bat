@@ -23,10 +23,6 @@ ECHO $zipFile = $shell.NameSpace("C:\Users\Administrator\Downloads\test_db-maste
 ECHO $destinationFolder = $shell.NameSpace("C:\Users\Administrator\Downloads")           >> C:\Users\Administrator\Downloads\TempUnzipEmployee.ps1
 ECHO $destinationFolder.CopyHere($zipFile.Items())                                       >> C:\Users\Administrator\Downloads\TempUnzipEmployee.ps1
 
-ECHO Adding grant security to standard ImportEmployee...
-ECHO GRANT SUPER ON *.* TO compose;                                                      >> C:\Users\Administrator\Downloads\test_db-master\employees.sql
-ECHO GRANT ALL ON *.* TO compose;                                                        >> C:\Users\Administrator\Downloads\test_db-master\employees.sql
-
 ECHO Downloading Employee files...
 CD "c:\Users\Administrator\Downloads"
 POWERSHELL c:\Users\Administrator\Downloads\TempDownloadEmployee.ps1 > C:\Users\Administrator\Downloads\DownloadEmployee.log
@@ -34,6 +30,10 @@ POWERSHELL c:\Users\Administrator\Downloads\TempDownloadEmployee.ps1 > C:\Users\
 ECHO Unpacking Employee files...
 CD "c:\Users\Administrator\Downloads"
 POWERSHELL c:\Users\Administrator\Downloads\TempUnzipEmployee.ps1> C:\Users\Administrator\Downloads\UnzipEmployee.log
+
+ECHO Adding grant security to standard ImportEmployee...
+ECHO GRANT SUPER ON *.* TO compose;                                                      >> C:\Users\Administrator\Downloads\test_db-master\employees.sql
+ECHO GRANT ALL ON *.* TO compose;                                                        >> C:\Users\Administrator\Downloads\test_db-master\employees.sql
 
 ECHO Creating MySQL Employee dababase...
 CD "C:\Users\Administrator\Downloads\test_db-master"
