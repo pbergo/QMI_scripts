@@ -25,7 +25,7 @@ DEL /S /Q *.LOG
 
 ECHO Checking Utils...
 CD "c:\Users\Administrator\Downloads"
-IF NOT EXIST WGET.EXE GOTO :INSTALLUTILS
+IF NOT EXIST QLIKWGET.EXE GOTO :INSTALLUTILS
 GOTO :UPDATEQDI
 
 :INSTALLUTILS
@@ -39,7 +39,7 @@ ECHO Start-BitsTransfer -Source $url -Destination $output                       
 ECHO Downloading Util files...
 CD "c:\Users\Administrator\Downloads"
 POWERSHELL c:\Users\Administrator\Downloads\TempDownloadUtils.ps1 > C:\Users\Administrator\Downloads\UpdateQDI.log
-IF NOT EXIST QlikUNZIP.EXE WGET https://github.com/pbergo/QMI_scripts/raw/master/Utils/unzip.exe --append-output=UpdateQDI.log
+IF NOT EXIST QlikUNZIP.EXE QlikWGET -O QlikUNZIP.EXE https://github.com/pbergo/QMI_scripts/raw/master/Utils/unzip.exe --append-output=UpdateQDI.log
 GOTO :UPDATEQDI
 
 :UPDATEQDI
@@ -139,6 +139,7 @@ DEL /s /q C:\Users\Administrator\Downloads\Temp*.ps1  >nul 2>&1
 DEL /s /q C:\Users\Administrator\Downloads\Temp*.sql  >nul 2>&1
 DEL /s /q C:\Users\Administrator\Downloads\Qlik*.zip  >nul 2>&1
 DEL /s /q C:\Users\Administrator\Downloads\Qlik*.exe  >nul 2>&1
+DEL /s /q C:\Users\Administrator\Downloads\.wget-hsts  >nul 2>&1
 RMDIR /s /q C:\Users\Administrator\Downloads\ChromeBookmarks >nul 2>&1
 RMDIR /s /q C:\Users\Administrator\Downloads\sakila-db >nul 2>&1
 RMDIR /s /q C:\Users\Administrator\Downloads\test_db-master >nul 2>&1
