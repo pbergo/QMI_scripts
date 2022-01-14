@@ -120,7 +120,7 @@ ECHO Updating Info Files...
 CD "c:\Users\Administrator\Desktop"
 DEL /S /Q *.txt
 DEL /S /Q *.url
-IF NOT EXIST "QlikCompose_Lab_Env_Information.txt" QlikWGET -O QlikUNZIP.EXE https://github.com/pbergo/QMI_scripts/raw/master/QlikCompose_Lab_Env_Information.txt --append-output=UpdateQDI.log
+IF NOT EXIST Lab_Env_Information.txt QlikWGET -O Lab_Env_Information.txt https://github.com/pbergo/QMI_scripts/raw/master/QlikCompose_Lab_Env_Information.txt --append-output=UpdateQDI.log
 
 GOTO :CLEANFILES
 
