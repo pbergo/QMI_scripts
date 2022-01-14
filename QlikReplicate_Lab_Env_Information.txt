@@ -1,0 +1,18 @@
+This Qlik Data Warehouse Lab environment consists of the following:
+
+MySQL 5.7 database (default port 3306)
+	Root password:  (blank)
+MS SQL Server 2017 database instance (default port 1433)
+	sa password:  C0mp0se1
+
+Qlik Replicate 2021.11.0.165
+Qlik Enterprise Manager 2021.11.0.198
+Qlik Compose 2021.5.0.69 - service stopped
+
+Qlik Replicate & Enterprise Manager
+	user /pwd :   administrator/aA)@x5-6Zdy
+
+To reset the environment - 
+
+run the ResetMySQLSrc.bat file
+run the RestSQLServerTgt.bat file
