@@ -20,25 +20,25 @@ SET /P confirm=Are you sure (Y/[N])?
 IF /I "%confirm%" NEQ "Y" GOTO ENDBYUSER
 
 ECHO Cleaning log files...
-CD "c:\Users\Administrator\Downloads"
+CD "%homepath%\Downloads"
 DEL /S /Q *.LOG
 
 ECHO Checking Utils...
-CD "c:\Users\Administrator\Downloads"
+CD "%homepath%\Downloads"
 IF NOT EXIST QLIKWGET.EXE GOTO :INSTALLUTILS
 GOTO :UPDATEQDI
 
 :INSTALLUTILS
 ECHO Creating tempfile DownloadWget...
-ECHO $url = "https://github.com/pbergo/QMI_scripts/raw/master/Utils/wget.exe"   > C:\Users\Administrator\Downloads\TempDownloadUtils.ps1
-ECHO $output = "C:\Users\Administrator\Downloads\Qlikwget.exe"                  >> C:\Users\Administrator\Downloads\TempDownloadUtils.ps1
-ECHO $start_time = Get-Date                                                     >> C:\Users\Administrator\Downloads\TempDownloadUtils.ps1
-ECHO Import-Module BitsTransfer                                                 >> C:\Users\Administrator\Downloads\TempDownloadUtils.ps1
-ECHO Start-BitsTransfer -Source $url -Destination $output                       >> C:\Users\Administrator\Downloads\TempDownloadUtils.ps1
+ECHO $url = "https://github.com/pbergo/QMI_scripts/raw/master/Utils/wget.exe"   > %homepath%\Downloads\TempDownloadUtils.ps1
+ECHO $output = "C:\Users\Administrator\Downloads\Qlikwget.exe"                  >> %homepath%\Downloads\TempDownloadUtils.ps1
+ECHO $start_time = Get-Date                                                     >> %homepath%\Downloads\TempDownloadUtils.ps1
+ECHO Import-Module BitsTransfer                                                 >> %homepath%\Downloads\TempDownloadUtils.ps1
+ECHO Start-BitsTransfer -Source $url -Destination $output                       >> %homepath%\Downloads\TempDownloadUtils.ps1
 
 ECHO Downloading Util files...
-CD "c:\Users\Administrator\Downloads"
-POWERSHELL c:\Users\Administrator\Downloads\TempDownloadUtils.ps1 > C:\Users\Administrator\Downloads\UpdateQDI.log
+CD "%homepath%\Downloads"
+POWERSHELL %homepath%\Downloads\TempDownloadUtils.ps1 > %homepath%\Downloads\UpdateQDI.log
 IF NOT EXIST QlikUNZIP.EXE QlikWGET -O QlikUNZIP.EXE https://github.com/pbergo/QMI_scripts/raw/master/Utils/unzip.exe --append-output=UpdateQDI.log
 GOTO :UPDATEQDI
 
@@ -56,17 +56,17 @@ IF EXIST QlikBookmarks.zip DEL /S /Q QlikBookmarks.zip
 QlikWGET -O QlikBookmarks.zip https://github.com/pbergo/QMI_scripts/raw/master/ChromeBookmarks.zip --append-output=UpdateQDI.log
 
 ECHO Unpacking Qlik Replicate...
-QlikUNZIP -o QlikReplicate.zip >> C:\Users\Administrator\Downloads\UpdateQDI.log
+QlikUNZIP -o QlikReplicate.zip >> %homepath%\Downloads\UpdateQDI.log
 ECHO Upgrading Qlik Replicate...
 QlikReplicate_2021.11.0.165_X64.exe
 
 ECHO Unpacking Qlik Compose...
-QlikUNZIP -o QlikCompose.zip >> C:\Users\Administrator\Downloads\UpdateQDI.log
+QlikUNZIP -o QlikCompose.zip >> %homepath%\Downloads\UpdateQDI.log
 ECHO Upgrading Qlik Compose...
 Qlik_Compose_2021.8.0.336.exe
 
 ECHO Unpacking Bookmarks...
-QlikUNZIP -o QlikBookmarks.zip >> C:\Users\Administrator\Downloads\UpdateQDI.log
+QlikUNZIP -o QlikBookmarks.zip >> %homepath%\Downloads\UpdateQDI.log
 :CHKCHROMEOPEN
 ECHO Installing Bookmarks...
 TASKLIST /FI "IMAGENAME eq chrome.exe" | FINDSTR "chrome.exe" > nul
@@ -75,7 +75,7 @@ CALL :CHROMEISOPEN
 GOTO :CHKCHROMEOPEN
 )
 SET CHROMEBASE=%LOCALAPPDATA%\Google\Chrome\User Data\Default\
-SET CHROMEBACKUPDIR=C:\Users\Administrator\Downloads\ChromeBookmarks
+SET CHROMEBACKUPDIR=%homepath%\Downloads\ChromeBookmarks
 IF EXIST "%CHROMEBACKUPDIR%" XCOPY "%CHROMEBACKUPDIR%" "%CHROMEBASE%" /E /Q /Y /c
 GOTO :INSTALLDBS
 
@@ -96,31 +96,31 @@ IF EXIST Qlikemployee-db.zip DEL /S /Q Qliksakila-db.zip
 QlikWGET -O Qlikemployee-db.zip https://github.com/datacharmer/test_db/archive/refs/heads/master.zip
 
 ECHO Unpacking sakila...
-QlikUNZIP -o Qliksakila-db.zip >> C:\Users\Administrator\Downloads\UpdateQDI.log
+QlikUNZIP -o Qliksakila-db.zip >> %homepath%\Downloads\UpdateQDI.log
 ECHO Creating tempfile ImportSakila...
-ECHO DROP SCHEMA IF EXISTS sakila;                                                  > C:\Users\Administrator\Downloads\TempImportSakila.sql
-ECHO SOURCE C:/Users/Administrator/Downloads/sakila-db/sakila-schema.sql;           >> C:\Users\Administrator\Downloads\TempImportSakila.sql
-ECHO SOURCE C:/Users/Administrator/Downloads/sakila-db/sakila-data.sql;             >> C:\Users\Administrator\Downloads\TempImportSakila.sql
-ECHO GRANT SUPER ON *.* TO compose;                                                 >> C:\Users\Administrator\Downloads\TempImportSakila.sql
-ECHO GRANT ALL ON *.* TO compose;                                                   >> C:\Users\Administrator\Downloads\TempImportSakila.sql
+ECHO DROP SCHEMA IF EXISTS sakila;                                                  > %homepath%\Downloads\TempImportSakila.sql
+ECHO SOURCE C:/Users/Administrator/Downloads/sakila-db/sakila-schema.sql;           >> %homepath%\Downloads\TempImportSakila.sql
+ECHO SOURCE C:/Users/Administrator/Downloads/sakila-db/sakila-data.sql;             >> %homepath%\Downloads\TempImportSakila.sql
+ECHO GRANT SUPER ON *.* TO compose;                                                 >> %homepath%\Downloads\TempImportSakila.sql
+ECHO GRANT ALL ON *.* TO compose;                                                   >> %homepath%\Downloads\TempImportSakila.sql
 ECHO Installing sakila database...
-"C:\Program Files\MySQL\MySQL Server 5.7\bin\mysql" -u root < C:\Users\Administrator\Downloads\TempImportSakila.sql >> C:\Users\Administrator\Downloads\UpdateQDI.log
+"C:\Program Files\MySQL\MySQL Server 5.7\bin\mysql" -u root < %homepath%\Downloads\TempImportSakila.sql >> %homepath%\Downloads\UpdateQDI.log
 
 ECHO Unpacking employee...
-QlikUNZIP -o Qlikemployee-db.zip >> C:\Users\Administrator\Downloads\UpdateQDI.log
+QlikUNZIP -o Qlikemployee-db.zip >> %homepath%\Downloads\UpdateQDI.log
 ECHO Adding grant security to standard ImportEmployee...
-ECHO GRANT SUPER ON *.* TO compose;                                                 >> C:\Users\Administrator\Downloads\test_db-master\employees.sql
-ECHO GRANT ALL ON *.* TO compose;                                                   >> C:\Users\Administrator\Downloads\test_db-master\employees.sql
+ECHO GRANT SUPER ON *.* TO compose;                                                 >> %homepath%\Downloads\test_db-master\employees.sql
+ECHO GRANT ALL ON *.* TO compose;                                                   >> %homepath%\Downloads\test_db-master\employees.sql
 ECHO Installing employee database...
-CD "C:\Users\Administrator\Downloads\test_db-master"
-"C:\Program Files\MySQL\MySQL Server 5.7\bin\mysql" -u root < C:\Users\Administrator\Downloads\test_db-master\employees.sql >> C:\Users\Administrator\Downloads\UpdateQDI.log
-CD "c:\Users\Administrator\Downloads"
+CD "%homepath%\Downloads\test_db-master"
+"C:\Program Files\MySQL\MySQL Server 5.7\bin\mysql" -u root < %homepath%\Downloads\test_db-master\employees.sql >> %homepath%\Downloads\UpdateQDI.log
+CD "%homepath%\Downloads"
 
 ECHO Updating Info Files...
-CD "c:\Users\Administrator\Desktop"
+CD "%homepath%\Desktop"
 DEL /S /Q *.txt
 DEL /S /Q *.url
-IF NOT EXIST Lab_Env_Information.txt QlikWGET -O Lab_Env_Information.txt https://github.com/pbergo/QMI_scripts/raw/master/QlikCompose_Lab_Env_Information.txt --append-output=UpdateQDI.log
+IF NOT EXIST Lab_Env_Information.txt %homepath%\Downloads\QlikWGET -O Lab_Env_Information.txt https://github.com/pbergo/QMI_scripts/raw/master/QlikCompose_Lab_Env_Information.txt --append-output=UpdateQDI.log
 
 GOTO :CLEANFILES
 
@@ -130,14 +130,14 @@ GOTO :END
 
 :CLEANFILES
 ECHO Deleting tempfiles...
-DEL /s /q C:\Users\Administrator\Downloads\Temp*.ps1  >nul 2>&1
-DEL /s /q C:\Users\Administrator\Downloads\Temp*.sql  >nul 2>&1
-DEL /s /q C:\Users\Administrator\Downloads\Qlik*.zip  >nul 2>&1
-DEL /s /q C:\Users\Administrator\Downloads\Qlik*.exe  >nul 2>&1
-DEL /s /q C:\Users\Administrator\Downloads\.wget-hsts  >nul 2>&1
-RMDIR /s /q C:\Users\Administrator\Downloads\ChromeBookmarks >nul 2>&1
-RMDIR /s /q C:\Users\Administrator\Downloads\sakila-db >nul 2>&1
-RMDIR /s /q C:\Users\Administrator\Downloads\test_db-master >nul 2>&1
+DEL /s /q %homepath%\Downloads\Temp*.ps1  >nul 2>&1
+DEL /s /q %homepath%\Downloads\Temp*.sql  >nul 2>&1
+DEL /s /q %homepath%\Downloads\Qlik*.zip  >nul 2>&1
+DEL /s /q %homepath%\Downloads\Qlik*.exe  >nul 2>&1
+DEL /s /q %homepath%\Downloads\.wget-hsts  >nul 2>&1
+RMDIR /s /q %homepath%\Downloads\ChromeBookmarks >nul 2>&1
+RMDIR /s /q %homepath%\Downloads\sakila-db >nul 2>&1
+RMDIR /s /q %homepath%\Downloads\test_db-master >nul 2>&1
 GOTO :END
 
 :END 
