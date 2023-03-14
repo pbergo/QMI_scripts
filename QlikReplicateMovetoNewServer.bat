@@ -10,6 +10,8 @@ REM *********************************************************
 
 SETLOCAL
 
+REM ***************************
+REM Variables section
 SET volume=D
 SET dvolume=%volume%:\Attunity\
 SET datafolder=%dvolume%data
@@ -19,6 +21,13 @@ SET adminuser=repadmin
 SET adminpwd=Qlik1234!
 SET mukpwd=QlikReplicateNovember2022MaskterKey
 SET mkpwd=QlikReplicateNovember2022MaskterUserKey
+
+REM End variables section
+REM ***************************
+
+
+REM ***************************
+REM Main section
 
 IF EXIST "%datafolder%" (
     ECHO Data Folder detected, set default installation to Node 2 !
@@ -85,7 +94,7 @@ IF /I "%node%" == "1" (
 )
 
 :CHECKVOL
-IF EXIST "%dvolume%" (
+IF EXIST %volume%:\ (
     ECHO Volume %volume% is enabled, continuing installation...
     GOTO :INSTUSERS
 ) ELSE (
@@ -162,9 +171,9 @@ IF /I "%node%" == "1" (
 
     ECHO Restarting Replicate Services...
     "C:\Program Files\Attunity\Replicate\bin\stopserver.cmd"  >> %homepath%\Downloads\InstallQDI.log
-    timeout 20 > nul
+    ECHO Press ENTER
     "C:\Program Files\Attunity\Replicate\bin\startserver.cmd" >> %homepath%\Downloads\InstallQDI.log
-    timeout 20 > nul
+    TIMEOUT 10 
 
     ECHO Exporting users...
     "C:\Program Files\Attunity\Replicate\bin\repuictl.exe" -d %datafolder% repository export_acl -f %userfile% >> %homepath%\Downloads\InstallQDI.log
@@ -173,10 +182,11 @@ IF /I "%node%" == "1" (
 ) else (
     ECHO Setting User Masterkey...
     "C:\Program Files\Attunity\Replicate\bin\repUiCtl.exe" -d %datafolder% masterukey set -p QlikReplicateNov22MasterUserKey2023    >> %homepath%\Downloads\InstallQDI.log
+    TIMEOUT 10 
 
     ECHO Stopping Replicate Services...
     "C:\Program Files\Attunity\Replicate\bin\stopserver.cmd"  >> %homepath%\Downloads\InstallQDI.log
-    timeout 20 > nul
+    TIMEOUT 10 
 
     ECHO Restore data folder to default name...
     MOVE %datafolder% %datafolder%_srv2             >> %homepath%\Downloads\InstallQDI.log
@@ -185,21 +195,30 @@ IF /I "%node%" == "1" (
     REM ****************************************
     REM Mandatory for diferent DOMAIN
     REM Copy the old muk.dat to be used on new server
-    COPY %datafolder%_srv2\muk.dat %datafolder%     >> %homepath%\Downloads\InstallQDI.log
+    COPY /y %datafolder%_srv2\muk.dat %datafolder%\muk.dat     >> %homepath%\Downloads\InstallQDI.log
 
     ECHO Please change the user.json file with current server file name then press ENTER
     PAUSE
     ECHO Importing users...
     "C:\Program Files\Attunity\Replicate\bin\repuictl.exe" -d %datafolder% repository import_acl -f %userfile%  >> %homepath%\Downloads\InstallQDI.log
+
+    ECHO Starting Replicate Services...
+    "C:\Program Files\Attunity\Replicate\bin\startserver.cmd" >> %homepath%\Downloads\InstallQDI.log
+    TIMEOUT 10 
+
     REM END Mandatory for diferent DOMAIN
     REM ****************************************
+
+    ECHO Stopping Replicate Services...
+    "C:\Program Files\Attunity\Replicate\bin\stopserver.cmd"  >> %homepath%\Downloads\InstallQDI.log
+    TIMEOUT 10 
 
     ECHO Delete ServiceConfiguration file to use serve new name
     DEL %datafolder%\ServiceConfiguration.xml >> %homepath%\Downloads\InstallQDI.log
 
     ECHO Starting Replicate Services...
     "C:\Program Files\Attunity\Replicate\bin\startserver.cmd" >> %homepath%\Downloads\InstallQDI.log
-    timeout 20 > nul
+    TIMEOUT 10 
 
     GOTO :CLEANFILES
 )
